@@ -1,0 +1,17 @@
+rem ------------------------------------------
+rem Monthly Remake Project 2026 : JANUARY
+rem Archipelagos
+rem JLMOONDOG - Josh Mooney
+rem ------------------------------------------
+
+rem setup screen -----------------------------
+rem ------------------------------------------
+set window on : set window layout 1, 1, 1
+set display mode 1024, 768, 32
+windowTitle$ = "MRP2026: Archipelagos"
+set window title windowTitle$
+
+autocam off
+sync on : sync rate 60
+
+
