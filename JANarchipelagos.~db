@@ -14,4 +14,86 @@ set window title windowTitle$
 autocam off
 sync on : sync rate 60
 
+rem declare variables ------------------------
+rem ------------------------------------------
+rem system variables
+debug = 1 : `debug menu on/off
+errorMessage$ = "Error Code" : `01=loading
+rem map variables
+dim mapLines$(1000) : `for reading map files
+lineCount = 0 : `# of lines in map file
+readMap$ = "" : `var to read map file line
+mapLoadMode = 1 : `0=off 1=int map 2=heightmap 3=load objects
+mapWidth = 0 : `map terrain size
+mapHeight = 0
+tileSize = 10.0
 
+rem load map ---------------------------------
+rem ------------------------------------------
+mapFile$ = "maps/testmap.map"
+if file exist(mapFile$) = 0 : `check for map file
+   exit prompt errorMessage$+" 01", mapFile$
+   end
+endif
+
+open to read 1, mapFile$ : `read map file & store in array
+   while file end(1) = 0
+      inc lineCount
+      read string 1, readMap$
+      mapLines$(lineCount) = UPPER$(TRIM$(readMap$))
+   endwhile
+close file 1
+
+for m = 1 to lineCount : `step through mapLines
+   c$ = Left$(mapLines$(m),2)
+   select c$
+      case "SZ" : `map size
+
+      endcase
+   endselect
+next m
+
+rem setup enviroment -------------------------
+rem ------------------------------------------
+fog on : fog color 0
+fog distance 1000
+backdrop on : color backdrop 0
+set ambient light 35
+color ambient light rgb(255,255,255)
+set camera range 5, 2000
+
+rem main game loop ---------------------------
+rem ------------------------------------------
+do
+rem debug menu -------------------------------
+rem ------------------------------------------
+if debug = 1
+   set cursor 0,0
+   print "  ** DEBUG MENU **"
+   print "  First MAPLINE: ";mapLines$(1)
+endif
+
+   sync
+loop
+
+rem functions --------------------------------
+rem ------------------------------------------
+FUNCTION TRIM$( s$ )
+
+    ` Remove leading spaces and tabs
+    WHILE LEN(s$) > 0
+        c$ = LEFT$(s$,1)
+        IF c$ <> " " AND c$ <> CHR$(9) THEN EXIT
+        s$ = MID$(s$,2)
+    ENDWHILE
+
+    ` Remove trailing spaces and tabs
+    WHILE LEN(s$) > 0
+        c$ = RIGHT$(s$,1)
+        IF c$ <> " " AND c$ <> CHR$(9) THEN EXIT
+        s$ = LEFT$(s$,LEN(s$)-1)
+    ENDWHILE
+
+    returnTrim$ = s$
+
+ENDFUNCTION returnTrim$

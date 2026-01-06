@@ -97,3 +97,4 @@ FUNCTION TRIM$( s$ )
     returnTrim$ = s$
 
 ENDFUNCTION returnTrim$
+
