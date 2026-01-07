@@ -26,8 +26,8 @@ readMap$ = "" : `var to read map file line
 mapLoadMode = 1 : `0=off 1=int map 2=heightmap 3=load objects
 mapWidth = 0 : `map terrain size
 mapHeight = 0
-tileSize = 10.0
-rem obelisk var
+tileSize = 25.0
+rem obelisk var / model 5
 obeliskX# = 0.0
 obeliskZ# = 0.0
 obeliskMode = 0 : `0=destroyed 1=meltdown 2=active
@@ -66,15 +66,19 @@ for m = 1 to lineCount : `step through mapLines
       endcase
       case "ST" : `player start location
          grabe$ = RIGHT$(mapLines$(m),4)
-         playerStartX# = VAL(LEFT$(grabe$,2))
-         playerStartZ# = VAL(RIGHT$(grabe$,2))
+         playerStartX# = (VAL(LEFT$(grabe$,2)))*tileSize
+         playerStartZ# = (VAL(RIGHT$(grabe$,2)))*tileSize
          position camera playerStartX#, 5.0, playerStartZ#
       endcase
       case "OB" : `obelisk location
          grabe$ = RIGHT$(mapLines$(m),4)
-         obeliskX# = VAL(LEFT$(grabe$,2))
-         obeliskZ# = VAL(RIGHT$(grabe$,2))
+         obeliskX# = (VAL(LEFT$(grabe$,2)))*tileSize
+         obeliskZ# = (VAL(RIGHT$(grabe$,2)))*tileSize
          obeliskMode = 2
+         make object cube 5, 8
+         position object 5, obeliskX#, 16.0, obeliskZ#
+         color object 5, RGB(200,50,50)
+         scale object 5, 100, 400, 100
       endcase
       case "ND" : `node and location
          inc nodesCount, 1
@@ -84,7 +88,7 @@ for m = 1 to lineCount : `step through mapLines
          grabe$ = RIGHT$(mapLines$(m),4)
          nodeX# = (VAL(LEFT$(grabe$,2)))*tileSize
          nodeZ# = (VAL(RIGHT$(grabe$,2)))*tileSize
-         position object nodes(nodesCount), nodeX#, 0.0, nodeZ#
+         position object nodes(nodesCount), nodeX#, 2.0, nodeZ#
          color object nodes(nodesCount), RGB(50,200,200)
       endcase
       case "MP" : `switch map Load Mode
@@ -93,14 +97,26 @@ for m = 1 to lineCount : `step through mapLines
    endselect
 next m
 
+rem create terrain ---------------------------
+matrixsizeX#=mapWidth*tileSize
+matrixsizeZ#=mapHeight*tileSize
+matrixGridX#=mapWidth
+matrixGridZ#=mapHeight
+make matrix 1, matrixsizeX#, matrixsizeZ#, matrixgridX#, matrixgridZ#
+position matrix 1, 0-(tileSize/2), 0, 0-(tileSize/2)
+load image "media/maptexture.bmp",1
+prepare matrix texture 1,1,2,2
+fill matrix 1, 0.0, 1
+
 rem setup enviroment -------------------------
 rem ------------------------------------------
 fog on : fog color 0
-fog distance 1000
+fog distance 750
 backdrop on : color backdrop 0
 set ambient light 35
 color ambient light rgb(255,255,255)
-set camera range 5, 2000
+set camera range 5, 1000
+cls
 
 rem main game loop ---------------------------
 rem ------------------------------------------
