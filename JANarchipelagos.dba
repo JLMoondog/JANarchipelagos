@@ -27,6 +27,18 @@ mapLoadMode = 1 : `0=off 1=int map 2=heightmap 3=load objects
 mapWidth = 0 : `map terrain size
 mapHeight = 0
 tileSize = 10.0
+rem obelisk var
+obeliskX# = 0.0
+obeliskZ# = 0.0
+obeliskMode = 0 : `0=destroyed 1=meltdown 2=active
+rem nodes var
+nodesCount = 0
+dim nodes(100)
+dim nodesMode(100) : `0=destroyed 1=notconnected 2=connected+active
+   `models 101-200
+rem player variables
+playerStartX# = 0.0
+playerStartZ# = 0.0
 
 rem load map ---------------------------------
 rem ------------------------------------------
@@ -45,9 +57,36 @@ open to read 1, mapFile$ : `read map file & store in array
 close file 1
 
 for m = 1 to lineCount : `step through mapLines
-   c$ = Left$(mapLines$(m),2)
+   c$ = LEFT$(mapLines$(m),2)
    select c$
       case "SZ" : `map size
+         grabe$ = RIGHT$(mapLines$(m),4)
+         mapWidth = VAL(LEFT$(grabe$,2))
+         mapHeight = VAL(RIGHT$(grabe$,2))
+      endcase
+      case "ST" : `player start location
+         grabe$ = RIGHT$(mapLines$(m),4)
+         playerStartX# = VAL(LEFT$(grabe$,2))
+         playerStartZ# = VAL(RIGHT$(grabe$,2))
+      endcase
+      case "OB" : `obelisk location
+         grabe$ = RIGHT$(mapLines$(m),4)
+         obeliskX# = VAL(LEFT$(grabe$,2))
+         obeliskZ# = VAL(RIGHT$(grabe$,2))
+         obeliskMode = 2
+      endcase
+      case "ND" : `node and location
+         inc nodesCount, 1
+         nodes(nodesCount) = nodesCount+100
+         nodesMode(nodesCount) = 2
+         make object cube nodes(nodesCount), 4
+         grabe$ = RIGHT$(mapLines$(m),4)
+         nodeX# = VAL(LEFT$(grabe$,2))
+         nodeZ# = VAL(LEFT$(grabe$,2))
+         position object nodes(nodesCount), nodeX#, 0.0, nodeZ#
+         color object nodes(nodesCount), RGB(50,200,200)
+      endcase
+      case "MP" : `switch map Load Mode
 
       endcase
    endselect
