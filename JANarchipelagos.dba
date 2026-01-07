@@ -68,6 +68,7 @@ for m = 1 to lineCount : `step through mapLines
          grabe$ = RIGHT$(mapLines$(m),4)
          playerStartX# = VAL(LEFT$(grabe$,2))
          playerStartZ# = VAL(RIGHT$(grabe$,2))
+         position camera playerStartX#, 5.0, playerStartZ#
       endcase
       case "OB" : `obelisk location
          grabe$ = RIGHT$(mapLines$(m),4)
@@ -81,8 +82,8 @@ for m = 1 to lineCount : `step through mapLines
          nodesMode(nodesCount) = 2
          make object cube nodes(nodesCount), 4
          grabe$ = RIGHT$(mapLines$(m),4)
-         nodeX# = VAL(LEFT$(grabe$,2))
-         nodeZ# = VAL(LEFT$(grabe$,2))
+         nodeX# = (VAL(LEFT$(grabe$,2)))*tileSize
+         nodeZ# = (VAL(RIGHT$(grabe$,2)))*tileSize
          position object nodes(nodesCount), nodeX#, 0.0, nodeZ#
          color object nodes(nodesCount), RGB(50,200,200)
       endcase
@@ -110,7 +111,16 @@ if debug = 1
    set cursor 0,0
    print "  ** DEBUG MENU **"
    print "  First MAPLINE: ";mapLines$(1)
+   print "  nodes: ";nodesCount
+   print "  obX: ";obeliskX#
+   print "  obZ: ";obeliskZ#
 endif
+
+rem camera rotation debug --------------------
+rem ------------------------------------------
+inc rotY#, 2
+if rotY#>360 then dec rotY#,360
+rotate camera 0, rotY#, 0
 
    sync
 loop
