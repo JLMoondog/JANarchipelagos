@@ -6,13 +6,13 @@ rem ------------------------------------------
 
 rem setup screen -----------------------------
 rem ------------------------------------------
-set window on : set window layout 1, 1, 1
+`set window on : set window layout 1, 1, 1
 set display mode 1024, 768, 32
-windowTitle$ = "MRP2026: Archipelagos"
-set window title windowTitle$
-
+`windowTitle$ = "MRP2026: Archipelagos"
+`set window title windowTitle$
+hide mouse
 autocam off
-sync on : sync rate 60
+sync rate 0: sync on : sync rate 60
 
 rem declare variables ------------------------
 rem ------------------------------------------
@@ -39,6 +39,12 @@ dim nodesMode(100) : `0=destroyed 1=notconnected 2=connected+active
 rem player variables
 playerStartX# = 0.0
 playerStartZ# = 0.0
+MOUSE_SENS# = 0.15
+CAM_PITCH# = 0.0
+CAM_YAW# = 0.0
+SMOOTHING# = 0.35  : ` 0 = raw, 1 = very smooth (0.25–0.4 sweet spot)
+smoothMX# = 0
+smoothMY# = 0
 
 rem load map ---------------------------------
 rem ------------------------------------------
@@ -127,16 +133,30 @@ if debug = 1
    set cursor 0,0
    print "  ** DEBUG MENU **"
    print "  First MAPLINE: ";mapLines$(1)
+   print "  FPS:";screen fps()
    print "  nodes: ";nodesCount
    print "  obX: ";obeliskX#
    print "  obZ: ";obeliskZ#
 endif
 
-rem camera rotation debug --------------------
+rem mouse look -------------------------------
 rem ------------------------------------------
-inc rotY#, 2
-if rotY#>360 then dec rotY#,360
-rotate camera 0, rotY#, 0
+OLD_CAM_PITCH# = CAM_PITCH#
+
+rawMX# = mousemovex()
+rawMY# = mousemovey()
+
+smoothMX# = smoothMX# + (rawMX# - smoothMX#) * SMOOTHING#
+smoothMY# = smoothMY# + (rawMY# - smoothMY#) * SMOOTHING#
+
+CAM_YAW#   = wrapvalue(CAM_YAW# + smoothMX# * MOUSE_SENS#)
+CAM_PITCH# = wrapvalue(CAM_PITCH# + smoothMY# * MOUSE_SENS#)
+
+` Clamp pitch (no flipping)
+if CAM_PITCH# > 85 and CAM_PITCH# < 180 then CAM_PITCH# = 85
+if CAM_PITCH# >= 180 and CAM_PITCH# < 275 then CAM_PITCH# = 275
+
+rotate camera CAM_PITCH#, CAM_YAW#, 0
 
    sync
 loop
