@@ -23,10 +23,11 @@ rem map variables
 dim mapLines$(1000) : `for reading map files
 lineCount = 0 : `# of lines in map file
 readMap$ = "" : `var to read map file line
-mapLoadMode = 1 : `0=off 1=int map 2=heightmap 3=load objects
+mapLoadMode = 1 : `0=off 1=int map 2=heightmap
 mapWidth = 0 : `map terrain size
 mapHeight = 0
 tileSize = 25.0
+dim heightMap(64,64) : `heightmap array
 rem obelisk var / model 5
 obeliskX# = 0.0
 obeliskZ# = 0.0
@@ -64,6 +65,17 @@ close file 1
 
 for m = 1 to lineCount : `step through mapLines
    c$ = LEFT$(mapLines$(m),2)
+   if mapLoadMode = 2
+      for my = 1 to mapHeight
+         heightMap$ = mapLines$(m)
+         for mx = 1 to mapWidth
+            grabHeight$ = MID$(heightMap$,mx)
+            heightMap(mx,my)=VAL(grabHeight$)+1
+         next mx
+      next my
+      mapLoadMode = 0
+   endif
+   if mapLoadMode = 1
    select c$
       case "SZ" : `map size
          grabe$ = RIGHT$(mapLines$(m),4)
@@ -98,9 +110,10 @@ for m = 1 to lineCount : `step through mapLines
          color object nodes(nodesCount), RGB(50,200,200)
       endcase
       case "MP" : `switch map Load Mode
-
+         mapLoadMode = 2
       endcase
    endselect
+   endif
 next m
 
 rem create terrain ---------------------------
@@ -112,7 +125,13 @@ make matrix 1, matrixsizeX#, matrixsizeZ#, matrixgridX#, matrixgridZ#
 position matrix 1, 0-(tileSize/2), 0, 0-(tileSize/2)
 load image "media/maptexture.bmp",1
 prepare matrix texture 1,1,2,2
-fill matrix 1, 0.0, 1
+`texture island
+for tx = 0 to mapWidth-1
+   for ty = 0 to mapHeight-1
+      set matrix tile 1, tx, ty, heightMap(tx+1,ty+1)
+   next ty
+next tx
+update matrix 1
 
 rem setup enviroment -------------------------
 rem ------------------------------------------
@@ -137,6 +156,10 @@ if debug = 1
    print "  nodes: ";nodesCount
    print "  obX: ";obeliskX#
    print "  obZ: ";obeliskZ#
+   print "  HPX: ";heightMap(1,1)
+   print "  HPX: ";heightMap(5,5)
+   print "  HMG: ";heightMap$
+   print "  GHM: ";grabHeight$
 endif
 
 rem mouse look -------------------------------
