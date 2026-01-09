@@ -26,7 +26,7 @@ readMap$ = "" : `var to read map file line
 mapLoadMode = 1 : `0=off 1=int map 2=heightmap
 mapWidth = 0 : `map terrain size
 mapHeight = 0
-tileSize = 25.0
+tileSize = 15.0
 dim heightMap(64,64) : `heightmap array
 rem obelisk var / model 5
 obeliskX# = 0.0
@@ -68,6 +68,7 @@ for m = 1 to lineCount : `step through mapLines
    if mapLoadMode = 2
       for my = 1 to mapHeight
          heightMap$ = mapLines$(m)
+         inc m, 1
          for mx = 1 to mapWidth
             grabHeight$ = MID$(heightMap$,mx)
             heightMap(mx,my)=VAL(grabHeight$)+1
