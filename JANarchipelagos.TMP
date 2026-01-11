@@ -27,6 +27,10 @@ mapLoadMode = 1 : `0=off 1=int map 2=heightmap
 mapWidth = 0 : `map terrain size
 mapHeight = 0
 tileSize = 15.0
+`map tile types
+WATER_LEVEL = 0
+SAND_LEVEL = 1
+GRASS_LEVEL = 2
 dim heightMap(64,64) : `heightmap array
 rem obelisk var / model 5
 obeliskX# = 0.0
